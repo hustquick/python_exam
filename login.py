@@ -1,6 +1,5 @@
 import tkinter as tk
 from tkinter import messagebox
-import paper
 
 # 登陆窗口
 def login_window():
@@ -14,6 +13,15 @@ def login_window():
     entry_student_id.place(x=70, y=20)
     # 开始答题按钮
     tk.Button(window, text='开始答题', command=lambda: start_exam(var_student_id.get(), window)).place(x=35, y=50)
+    window.mainloop()
+
+def start_exam(student_id, window):
+    if not student_id:
+        messagebox.showerror('错误', '请输入学号!')
+    else:
+        # Generate exam paper for this student and start exam
+        # TODO: Call function to generate exam paper
+        print(f"Starting exam for student: {student_id}")
 
 if __name__ == '__main__':
     # 运行login窗口
