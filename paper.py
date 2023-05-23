@@ -13,6 +13,7 @@ def read_excel():
     return df
 
 # 生成试卷
+# 生成试卷
 def generate_paper(exam_window):
     # 读取Excel表格
     df = read_excel()
@@ -27,7 +28,9 @@ def generate_paper(exam_window):
     # 创建题目标签和选项复选框的变量
     question_label = tk.Label(exam_window, text='')
     choice_var = tk.IntVar()
-    choice_var.set(-1)  # 初始值为-1，表示未选择
+
+    # 初始化学生答案字典
+    student_answers = {}
 
     # 当前题目索引
     current_question = 0
@@ -35,8 +38,8 @@ def generate_paper(exam_window):
     # 显示题目和选项的函数
     def show_question():
         nonlocal current_question
+        choice_var.set(-1)  # 确保默认没有选中的选项
         # 获取当前题目的数据
-        question_num = current_question + 1  # 添加题号
         if current_question < len(choice_questions):
             question_type = 'choice'
             question = choice_questions.iloc[current_question]['question']
@@ -51,12 +54,12 @@ def generate_paper(exam_window):
             options = ['正确', '错误']
 
         # 更新题目标签和选项复选框
-        question_label.config(text=f"{question_num}. {question}")  # 加入题号
+        question_label.config(text=f'{current_question + 1}. {question}')
         question_label.pack()
 
         # 清空选项复选框
         for widget in exam_window.winfo_children():
-            if isinstance(widget, tk.Radiobutton) or isinstance(widget, tk.Checkbutton):
+            if isinstance(widget, tk.Radiobutton):
                 widget.pack_forget()
 
         # 创建选项复选框
@@ -70,27 +73,26 @@ def generate_paper(exam_window):
             judge_radio2 = tk.Radiobutton(exam_window, text=options[1], variable=choice_var, value=2)
             judge_radio2.pack()
 
-    # 提交答案的函数
-    def submit_answer():
+    # 上一题的函数
+    def previous_question():
         nonlocal current_question
-        answer = choice_var.get()
-        if answer == -1:
-            messagebox.showerror('错误', '请选择一个选项')
-        else:
-            # 存储学生的答案
-            # TODO: 将学生答案存储到适当的数据结构中
-            print(f'学生答案: {answer}')
+        if current_question > 0:
+            current_question -= 1
+            show_question()
 
-            # 前进到下一题或完成试卷
+    # 下一题的函数
+    def next_question():
+        nonlocal current_question
+        if current_question < len(choice_questions) + len(judge_questions) - 1:
             current_question += 1
-            if current_question < len(choice_questions) + len(judge_questions):
-                show_question()
-            else:
-                messagebox.showinfo('提示', '试卷已完成')
+            show_question()
 
     # 显示第一题
     show_question()
 
     # 创建提交按钮
-    submit_button = tk.Button(exam_window, text='提交答案', command=submit_answer)
-    submit_button.pack()
+    previous_button = tk.Button(exam_window, text='上一题', command=previous_question)
+    previous_button.pack(side='left', padx=20)
+    next_button = tk.Button(exam_window, text='下一题', command=next_question)
+    next_button.pack(side='right', padx=20)
+
